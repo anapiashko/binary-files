@@ -26,16 +26,16 @@ struct full_address {
     unsigned number_house : 8;
 };
 struct client {
-    name name;
-    gender gender;
+    name _name;
+    gender _gender;
     char nation[30];
     int growth;
     int weight;
-    data_birth data_birth;
+    data_birth _data_birth;
     int number_ph;
-    full_address adress;
+    full_address address;
     long long card;
-    unsigned long long bahk_count;
+    unsigned long long bank_count;
 };
 client* InitArray(int Dimension);
 
@@ -235,14 +235,14 @@ void add(client *&array, int &Dimension, int a) {
     for (int j = Dimension; j < Dimension + a; j++) {
         int s;
         cout << " your first name : ";
-        cin.getline(arr[j].name.first, 15);
+        cin.getline(arr[j]._name.first, 15);
         cout << "second : ";
-        cin.getline(arr[j].name.second, 15);
+        cin.getline(arr[j]._name.second, 15);
         cout << "third : ";
-        cin.getline(arr[j].name.third, 15);
+        cin.getline(arr[j]._name.third, 15);
         cout << " your gender \n 1) male \n 2) female : " << endl;
         cin >> s;
-        arr[j].gender = (gender)s;
+        arr[j]._gender = (gender)s;
         cin.ignore();
         cout << "your nationality : ";
         cin.getline(arr[j].nation, 15);
@@ -252,32 +252,32 @@ void add(client *&array, int &Dimension, int a) {
         cin >> arr[j].weight;
         cin.ignore();
         cout << "data of your birth : " << endl << "number ";
-        cin >> arr[j].data_birth.number;
+        cin >> arr[j]._data_birth.number;
         cout << "month ";
-        cin >> arr[j].data_birth.month;
+        cin >> arr[j]._data_birth.month;
         cout << "year ";
-        cin >> arr[j].data_birth.year;
+        cin >> arr[j]._data_birth.year;
         cout << "your number : ";
         cin >> arr[j].number_ph;
-        cout << "your adress : " << endl << " index : ";
-        cin >> arr[j].adress.index;
+        cout << "your address : " << endl << " index : ";
+        cin >> arr[j].address.index;
         cin.ignore();
         cout << "country : ";
-        cin.getline(arr[j].adress.country, 15);
+        cin.getline(arr[j].address.country, 15);
         cout << "region : ";
-        cin.getline(arr[j].adress.region, 15);
+        cin.getline(arr[j].address.region, 15);
         cout << "city : ";
-        cin.getline(arr[j].adress.city, 15);
+        cin.getline(arr[j].address.city, 15);
         cout << "street : ";
-        cin.getline(arr[j].adress.street, 15);
+        cin.getline(arr[j].address.street, 15);
         cout << " house number : ";
         cin >> s;
-        arr[j].adress.number_house = s;
+        arr[j].address.number_house = s;
         cin.ignore();
         cout << "number of your credit card : ";
         cin >> arr[j].card;
         cout << "number of your bank account : ";
-        cin >> arr[j].bahk_count;
+        cin >> arr[j].bank_count;
         cin.ignore();
     }
     Dimension += a;
@@ -285,43 +285,43 @@ void add(client *&array, int &Dimension, int a) {
     array = arr;
 }
 void DisplayClient(client a) {
-    cout << "full name : " << a.name.first << " " << a.name.second << " " <<
-         a.name.third << endl;
-    if (a.gender == 1)
+    cout << "full _name : " << a._name.first << " " << a._name.second << " " <<
+         a._name.third << endl;
+    if (a._gender == 1)
         cout << " male gender" << endl;
-    if (a.gender == 2)
+    if (a._gender == 2)
         cout << " female gender" << endl;
     cout << "nationality: " << a.nation << endl;
     cout << " growth " << a.growth << endl;
     cout << "weight " << a.weight << endl;
-    cout << "date of birth : " << a.data_birth.number << "." << a.data_birth.month
-         << "." << a.data_birth.year << endl;
+    cout << "date of birth : " << a._data_birth.number << "." << a._data_birth.month
+         << "." << a._data_birth.year << endl;
     cout << " your number : " << a.number_ph << endl;
-    cout << " adress : " << a.adress.index << ";" << a.adress.country << "," <<
-         a.adress.region << "," << a.adress.city << "," << a.adress.street << ","
-         << a.adress.number_house << endl;
+    cout << " address : " << a.address.index << ";" << a.address.country << "," <<
+         a.address.region << "," << a.address.city << "," << a.address.street << ","
+         << a.address.number_house << endl;
     cout << " number of your credit card : " << a.card << endl;
-    cout << "bank count " << a.bahk_count << endl;
+    cout << "bank count " << a.bank_count << endl;
 }
 void DisplayArray(client* array, int Dimension) {
     for (int i = 0; i < Dimension; i++) {
-        cout << "full name : " << array[i].name.first << " " << array[i].name.second << " " <<
-             array[i].name.third << endl;
-        if (array[i].gender == 1)
+        cout << "full name : " << array[i]._name.first << " " << array[i]._name.second << " " <<
+             array[i]._name.third << endl;
+        if (array[i]._gender == 1)
             cout << " male gender" << endl;
-        if (array[i].gender == 2)
+        if (array[i]._gender == 2)
             cout << " female gender" << endl;
         cout << "nationality: " << array[i].nation << endl;
-        cout << " growth " << array[i].growth << endl;
+        cout << "growth " << array[i].growth << endl;
         cout << "weight " << array[i].weight << endl;
-        cout << "date of birth : " << array[i].data_birth.number << "." << array[i].data_birth.month
-             << "." << array[i].data_birth.year << endl;
+        cout << "date of birth : " << array[i]._data_birth.number << "." << array[i]._data_birth.month
+             << "." << array[i]._data_birth.year << endl;
         cout << " your number : " << array[i].number_ph << endl;
-        cout << " adress : " << array[i].adress.index << ";" << array[i].adress.country << "," <<
-             array[i].adress.region << "," << array[i].adress.city << "," << array[i].adress.street << ","
-             << array[i].adress.number_house << endl;
+        cout << " address : " << array[i].address.index << ";" << array[i].address.country << "," <<
+             array[i].address.region << "," << array[i].address.city << "," << array[i].address.street << ","
+             << array[i].address.number_house << endl;
         cout << " number of your credit card : " << array[i].card << endl;
-        cout << "bank count " << array[i].bahk_count << endl;
+        cout << "bank count " << array[i].bank_count << endl;
     }
 }
 void InitClient(client* array, int Dimension) {
@@ -329,14 +329,14 @@ void InitClient(client* array, int Dimension) {
         cout << "Client " << i + 1 << endl;
         int s;
         cout << " your first name : ";
-        cin.getline(array[i].name.first, 15);
+        cin.getline(array[i]._name.first, 15);
         cout << "second : ";
-        cin.getline(array[i].name.second, 15);
+        cin.getline(array[i]._name.second, 15);
         cout << "third : ";
-        cin.getline(array[i].name.third, 15);
+        cin.getline(array[i]._name.third, 15);
         cout << " your gender \n 1) male \n 2) female : " << endl;
         cin >> s;
-        array[i].gender = (gender)s;
+        array[i]._gender = (gender)s;
         cin.ignore();
         cout << "your nationality : ";
         cin.getline(array[i].nation, 15);
@@ -346,32 +346,32 @@ void InitClient(client* array, int Dimension) {
         cin >> array[i].weight;
         cin.ignore();
         cout << "data of your birth : " << endl << "number ";
-        cin >> array[i].data_birth.number;
+        cin >> array[i]._data_birth.number;
         cout << "month ";
-        cin >> array[i].data_birth.month;
+        cin >> array[i]._data_birth.month;
         cout << "year ";
-        cin >> array[i].data_birth.year;
+        cin >> array[i]._data_birth.year;
         cout << "your number : ";
         cin >> array[i].number_ph;
-        cout << "your adress : " << endl << " index : ";
-        cin >> array[i].adress.index;
+        cout << "your address : " << endl << " index : ";
+        cin >> array[i].address.index;
         cin.ignore();
         cout << "country : ";
-        cin.getline(array[i].adress.country, 15);
+        cin.getline(array[i].address.country, 15);
         cout << "region : ";
-        cin.getline(array[i].adress.region, 15);
+        cin.getline(array[i].address.region, 15);
         cout << "city : ";
-        cin.getline(array[i].adress.city, 15);
+        cin.getline(array[i].address.city, 15);
         cout << "street : ";
-        cin.getline(array[i].adress.street, 15);
+        cin.getline(array[i].address.street, 15);
         cout << " house number : ";
         cin >> s;
-        array[i].adress.number_house = s;
+        array[i].address.number_house = s;
         cin.ignore();
         cout << "number of your credit card : ";
         cin >> array[i].card;
         cout << "number of your bank account : ";
-        cin >> array[i].bahk_count;
+        cin >> array[i].bank_count;
         cin.ignore();
     }
     char file[] = "clients.txt";
