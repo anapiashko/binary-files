@@ -37,31 +37,34 @@ struct client {
     long long card;
     unsigned long long bank_count;
 };
-client* InitArray(int Dimension);
 
-void InitClient(client* array, int i);
+client *InitArray(int Dimension);
 
-void DisplayArray(client* array, int Dimension);
+void InitClient(client *array, int i);
+
+void DisplayArray(client *array, int Dimension);
 
 void DisplayClient(client a);
 
-void add(client *&array, int &Dimension, int a = 1 );
+void add(client *&array, int &Dimension, int a = 1);
 
-int delete_(client *&array, int &Dimension);
+void deleteOneFromClients(client *&array, int position);
 
-void InitFile(char* file, client* array, int Dimension);
+void InitFile(char *file, client *array, int Dimension);
 
-void DisplayFile(char* file);
+void DisplayFile(char *file);
 
-void AddToEndFile(char* file, client* array, int Dimension, int n);
+void AddToEndFile(char *file, client *array, int Dimension, int n);
 
-void RemoveElementFromFile(char* file, int Position);
+void RemoveElementFromFile(char *file, int Position);
 
-void shell_sort(client* array, int Dimension);
+void shell_sort(client *array, int Dimension);
 
 int menu();
 
-int main(int argc, char* argv[]) {
+int getPositionToRemove();
+
+int main(int argc, char *argv[]) {
 /*
 	char password[] = "password";
 
@@ -78,20 +81,20 @@ int main(int argc, char* argv[]) {
     int size;
     cout << "Number of clients : ";
     cin >> size;
-    client* b = InitArray(size);
-    void(*pointers_f[])(client* a, int b) = { InitClient,DisplayArray, shell_sort };
+    client *clients = InitArray(size);
+    void (*pointers_f[])(client *a, int b) = {InitClient, DisplayArray, shell_sort};
     while (true) {
         int a = menu();
         switch (a) {
             default: {
-                (*pointers_f[a - 1])(b, size);
+                (*pointers_f[a - 1])(clients, size);
                 break;
             }
             case 4: {
                 int person;
                 cout << "Which person do you to see? ";
                 cin >> person;
-                DisplayClient(b[person - 1]);
+                DisplayClient(clients[person - 1]);
                 break;
             }
             case 5: {
@@ -99,15 +102,18 @@ int main(int argc, char* argv[]) {
                 cout << "How many people do you want to add to your database? ";
                 cin >> a;
                 cin.ignore();
-                add(b, size, a);
-                AddToEndFile(file, b, size, a);
+                add(clients, size, a);
+                AddToEndFile(file, clients, size, a);
                 DisplayFile(file);
                 break;
             }
             case 6: {
-                int position = delete_(b, size) ;
-                RemoveElementFromFile(file,position);
-                DisplayArray(b , size);
+                int position = getPositionToRemove();
+
+                deleteOneFromClients(clients, position);
+                RemoveElementFromFile(file, position);
+
+                DisplayArray(clients, size);
                 break;
             }
             case 7: {
@@ -115,9 +121,13 @@ int main(int argc, char* argv[]) {
                 system("pause");
                 return 0;
             }
+            case 8: {
+                DisplayFile(file);
+            }
         }
     }
 }
+
 int menu() {
     int n;
     cout << "    Menu" << endl;
@@ -128,26 +138,28 @@ int menu() {
     cout << "5) Add structure " << endl;
     cout << "6) Delete structure " << endl;
     cout << "7) Exit " << endl;
+    cout << "8) Display " << endl;
     cout << "Choose : ";
     cin >> n;
     cin.ignore();
-    if (n >= 1 && n <= 7)
+    if (n >= 1 && n <= 8)
         return n;
     else {
         cout << " Incorrect input! " << endl;
         menu();
     }
 }
-void shell_sort(client* array, int Dimension) {
+
+void shell_sort(client *array, int Dimension) {
     int i, j, k;
     client temp;
     int t;
-    for (k = Dimension/2; k > 0; k /= 2)
-        for (i = k; i < Dimension; i++){
+    for (k = Dimension / 2; k > 0; k /= 2)
+        for (i = k; i < Dimension; i++) {
             temp = array[i];
             t = array[i].growth;
-            for (j = i; j >= k; j -= k){
-                if(t < array[j - k].growth)
+            for (j = i; j >= k; j -= k) {
+                if (t < array[j - k].growth)
                     array[j] = array[j - k];
                 else
                     break;
@@ -155,27 +167,28 @@ void shell_sort(client* array, int Dimension) {
             array[j] = temp;
         }
 }
-void RemoveElementFromFile(char* file, int Position) {
+
+void RemoveElementFromFile(char *file, int Position) {
     ifstream fin;
     ofstream fout;
-    fin.open(file, ios::binary);
+    fin.open(file, ios::in | ios::binary);
     fin.seekg(0, ios_base::end);
     int n = fin.tellg() / sizeof(client);
     char new_file[] = "new_file.txt";
 
-    fin.seekg((Position-1) * sizeof(client), ios_base::beg);
+    fin.seekg((Position - 1) * sizeof(client), ios_base::beg);
     int before = fin.tellg() / sizeof(client);
-    client* temper = new client[before];
-    fin.read((char*)temper, sizeof(temper));
-    fout.open(new_file, ios::binary);
-    fout.write((char*)temper, sizeof(temper));
+    client *temper = new client[before];
+    fin.read((char *) temper, sizeof(temper));
+    fout.open(new_file, ios::out | ios::binary);
+    fout.write((char *) temper, sizeof(temper));
     fout.close();
 
     fin.seekg((Position) * sizeof(client), ios_base::beg);
-    client* temper2 = new client[n-before-1];
-    fin.read((char*)temper2, sizeof(temper2));
-    fout.open(new_file, ios::binary | ios::app);
-    fout.write((char*)temper2, sizeof(temper2));
+    client *temper2 = new client[n - before - 1];
+    fin.read((char *) temper2, sizeof(temper2));
+    fout.open(new_file, ios::out | ios::binary | ios::app);
+    fout.write((char *) temper2, sizeof(temper2));
     fout.close();
 
     delete[] temper;
@@ -186,49 +199,63 @@ void RemoveElementFromFile(char* file, int Position) {
     rename(new_file, file);
     DisplayFile(file);
 }
-void AddToEndFile(char* file , client* array, int Dimension , int n) {
+
+void AddToEndFile(char *file, client *array, int Dimension, int n) {
     ofstream fout;
-    fout.open(file,ios::binary | ios::app);
-    client* arr;
-    arr = array + Dimension-n;
+    fout.open(file, ios::binary | ios::app);
+    client *arr;
+    arr = array + Dimension - n;
     for (int i = 0; i < n; i++) {
-        fout.write((char*)(arr+i), sizeof(client));
+        fout.write((char *) (arr + i), sizeof(client));
     }
     fout.close();
 }
-void DisplayFile(char* file) {
+
+void DisplayFile(char *file) {
+
+    cout << "info in file: " << endl;
+
     ifstream fin;
-    fin.open(file, ios::binary);
-    client cl;
-    while (fin.read((char*)&cl, sizeof(client))) {
+    fin.open(file, ios::in | ios::binary);
+
+    while (!fin.eof()) {
+        client cl;
+        fin.read((char *) &cl, sizeof(client));
         DisplayClient(cl);
     }
     fin.close();
 }
-void InitFile(char* file, client* array, int Dimension) {
+
+void InitFile(char *file, client *array, int Dimension) {
     ofstream fout;
-    fout.open(file, ios::binary);
-    for(int i = 0; i < Dimension; i++){
-        fout.write((char*)&array[i], sizeof(client));
+    fout.open(file, ios::out | ios::binary);
+    for (int i = 0; i < Dimension; i++) {
+        fout.write((char *) &array[i], sizeof(client));
     }
     fout.close();
 }
-int delete_(client *&array, int &Dimension) {
+
+int getPositionToRemove() {
     int d;
     cout << " which person do you want to delete : ";
     cin >> d;
-    client* arr = new client[Dimension - 1];
-    for (int i = d - 1; i < Dimension; i++) {
+
+    return d;
+}
+
+void deleteOneFromClients(client *&array, int position) {
+    int dimension = sizeof(array);
+    client *arr = new client[dimension - 1];
+    for (int i = position - 1; i < dimension; i++) {
         arr[i] = array[i + 1];
     }
-    Dimension--;
     delete[] array;
     array = arr;
     cout << "The data was successfully deleted " << endl;
-    return d;
 }
+
 void add(client *&array, int &Dimension, int a) {
-    client* arr = new client[Dimension + a];
+    client *arr = new client[Dimension + a];
     for (int i = 0; i < Dimension; i++) {
         arr[i] = array[i];
     }
@@ -242,7 +269,7 @@ void add(client *&array, int &Dimension, int a) {
         cin.getline(arr[j]._name.third, 15);
         cout << " your gender \n 1) male \n 2) female : " << endl;
         cin >> s;
-        arr[j]._gender = (gender)s;
+        arr[j]._gender = (gender) s;
         cin.ignore();
         cout << "your nationality : ";
         cin.getline(arr[j].nation, 15);
@@ -284,6 +311,7 @@ void add(client *&array, int &Dimension, int a) {
     delete[] array;
     array = arr;
 }
+
 void DisplayClient(client a) {
     cout << "full _name : " << a._name.first << " " << a._name.second << " " <<
          a._name.third << endl;
@@ -301,84 +329,79 @@ void DisplayClient(client a) {
          a.address.region << "," << a.address.city << "," << a.address.street << ","
          << a.address.number_house << endl;
     cout << " number of your credit card : " << a.card << endl;
-    cout << "bank count " << a.bank_count << endl;
+    cout << "bank account " << a.bank_count << endl;
 }
-void DisplayArray(client* array, int Dimension) {
+
+void DisplayArray(client *array, int Dimension) {
+
+    cout << "info in program: " << endl;
+
     for (int i = 0; i < Dimension; i++) {
-        cout << "full name : " << array[i]._name.first << " " << array[i]._name.second << " " <<
-             array[i]._name.third << endl;
-        if (array[i]._gender == 1)
-            cout << " male gender" << endl;
-        if (array[i]._gender == 2)
-            cout << " female gender" << endl;
-        cout << "nationality: " << array[i].nation << endl;
-        cout << "growth " << array[i].growth << endl;
-        cout << "weight " << array[i].weight << endl;
-        cout << "date of birth : " << array[i]._data_birth.number << "." << array[i]._data_birth.month
-             << "." << array[i]._data_birth.year << endl;
-        cout << " your number : " << array[i].number_ph << endl;
-        cout << " address : " << array[i].address.index << ";" << array[i].address.country << "," <<
-             array[i].address.region << "," << array[i].address.city << "," << array[i].address.street << ","
-             << array[i].address.number_house << endl;
-        cout << " number of your credit card : " << array[i].card << endl;
-        cout << "bank count " << array[i].bank_count << endl;
+        DisplayClient(array[i]);
     }
 }
-void InitClient(client* array, int Dimension) {
-    for (int i = 0; i < Dimension; i++) {
-        cout << "Client " << i + 1 << endl;
-        int s;
-        cout << " your first name : ";
-        cin.getline(array[i]._name.first, 15);
-        cout << "second : ";
-        cin.getline(array[i]._name.second, 15);
-        cout << "third : ";
-        cin.getline(array[i]._name.third, 15);
-        cout << " your gender \n 1) male \n 2) female : " << endl;
-        cin >> s;
-        array[i]._gender = (gender)s;
-        cin.ignore();
-        cout << "your nationality : ";
-        cin.getline(array[i].nation, 15);
-        cout << "your growth : ";
-        cin >> array[i].growth;
-        cout << "weight : ";
-        cin >> array[i].weight;
-        cin.ignore();
-        cout << "data of your birth : " << endl << "number ";
-        cin >> array[i]._data_birth.number;
-        cout << "month ";
-        cin >> array[i]._data_birth.month;
-        cout << "year ";
-        cin >> array[i]._data_birth.year;
-        cout << "your number : ";
-        cin >> array[i].number_ph;
-        cout << "your address : " << endl << " index : ";
-        cin >> array[i].address.index;
-        cin.ignore();
-        cout << "country : ";
-        cin.getline(array[i].address.country, 15);
-        cout << "region : ";
-        cin.getline(array[i].address.region, 15);
-        cout << "city : ";
-        cin.getline(array[i].address.city, 15);
-        cout << "street : ";
-        cin.getline(array[i].address.street, 15);
-        cout << " house number : ";
-        cin >> s;
-        array[i].address.number_house = s;
-        cin.ignore();
-        cout << "number of your credit card : ";
-        cin >> array[i].card;
-        cout << "number of your bank account : ";
-        cin >> array[i].bank_count;
-        cin.ignore();
-    }
+
+void InitClient(client *array, int Dimension) {
+//    for (int i = 0; i < Dimension; i++) {
+//        cout << "Client " << i + 1 << endl;
+//        int s;
+//        cout << " your first name : ";
+//        cin.getline(array[i]._name.first, 15);
+//        cout << "second : ";
+//        cin.getline(array[i]._name.second, 15);
+//        cout << "third : ";
+//        cin.getline(array[i]._name.third, 15);
+//        cout << " your gender \n 1) male \n 2) female : " << endl;
+//        cin >> s;
+//        array[i]._gender = (gender)s;
+//        cin.ignore();
+//        cout << "your nationality : ";
+//        cin.getline(array[i].nation, 15);
+//        cout << "your growth : ";
+//        cin >> array[i].growth;
+//        cout << "weight : ";
+//        cin >> array[i].weight;
+//        cin.ignore();
+//        cout << "data of your birth : " << endl << "number ";
+//        cin >> array[i]._data_birth.number;
+//        cout << "month ";
+//        cin >> array[i]._data_birth.month;
+//        cout << "year ";
+//        cin >> array[i]._data_birth.year;
+//        cout << "your number : ";
+//        cin >> array[i].number_ph;
+//        cout << "your address : " << endl << " index : ";
+//        cin >> array[i].address.index;
+//        cin.ignore();
+//        cout << "country : ";
+//        cin.getline(array[i].address.country, 15);
+//        cout << "region : ";
+//        cin.getline(array[i].address.region, 15);
+//        cout << "city : ";
+//        cin.getline(array[i].address.city, 15);
+//        cout << "street : ";
+//        cin.getline(array[i].address.street, 15);
+//        cout << " house number : ";
+//        cin >> s;
+//        array[i].address.number_house = s;
+//        cin.ignore();
+//        cout << "number of your credit card : ";
+//        cin >> array[i].card;
+//        cout << "number of your bank account : ";
+//        cin >> array[i].bank_count;
+//        cin.ignore();
+//    }
     char file[] = "clients.txt";
     InitFile(file, array, Dimension);
     DisplayFile(file);
 }
-client* InitArray(int Dimension) {
-    client* array = new client[Dimension];
+
+client *InitArray(int Dimension) {
+    client *array = new client[Dimension];
+
+    for (int i = 0; i < Dimension; i++) {
+        array[i].bank_count = i + 1;
+    }
+
     return array;
 }
