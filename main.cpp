@@ -48,9 +48,9 @@ void display_array(client *pClient, int size);
 
 void display_client(client client);
 
-void add_clients(client *&pClient, int &size, int numberOfPeopleToAdd = 1);
+void add_clients(char *file, client *&pClient, int &size, int numberOfPeopleToAdd = 1);
 
-void delete_one_from_clients(client *&pClient, int &size, int position);
+void delete_one_from_clients(char *file, client *&pClient, int &size, int position);
 
 void display_file(char *file);
 
@@ -61,8 +61,6 @@ void remove_element_from_file(char *file, int Position);
 void shell_sort(client *array, int Dimension);
 
 int menu();
-
-int get_position_to_remove();
 
 int main(int argc, char *argv[]) {
 /*
@@ -110,17 +108,14 @@ int main(int argc, char *argv[]) {
                 cout << "How many people do you want to add_clients to your database? ";
                 cin >> numberOfPeopleToAdd;
                 cin.ignore();
-                add_clients(clients, size, numberOfPeopleToAdd);
-                add_clients_to_end_of_file(file, clients, size, numberOfPeopleToAdd);
+                add_clients(file, clients, size, numberOfPeopleToAdd);
                 break;
             }
             case 6: {
-                int position = get_position_to_remove();
-
-                delete_one_from_clients(clients, size, position);
-                remove_element_from_file(file, position);
-
-                display_array(clients, size);
+                int position;
+                cout << " which person do you want to delete : ";
+                cin >> position;
+                delete_one_from_clients(file, clients, size, position);
                 break;
             }
             case 7: {
@@ -129,7 +124,13 @@ int main(int argc, char *argv[]) {
                 return 0;
             }
             case 8: {
+                cout << "----------------------------" << endl;
+                cout << "info in program: " << endl;
+                display_array(clients, size);
+                cout << "----------------------------" << endl;
+                cout << "info in file: " << endl;
                 display_file(file);
+                cout << "----------------------------" << endl;
             }
         }
     }
@@ -219,8 +220,6 @@ void add_clients_to_end_of_file(char *file, client *array, int size, int numberO
 
 void display_file(char *file) {
 
-    cout << "info in file: " << endl;
-
     ifstream fin;
     fin.open(file, ios::in | ios::binary);
 
@@ -243,83 +242,80 @@ void init_file(char *file, client *array, int size) {
     fout.close();
 }
 
-int get_position_to_remove() {
-    int d;
-    cout << " which person do you want to delete : ";
-    cin >> d;
-
-    return d;
-}
-
-void delete_one_from_clients(client *&pClient, int &size, int position) {
-    client *arr = new client[size - 1];
+void delete_one_from_clients(char *file, client *&pClient, int &size, int position) {
+    client *new_pClient = new client[size - 1];
     for (int i = 0; i < position - 1; i++) {
-        arr[i] = pClient[i];
+        new_pClient[i] = pClient[i];
     }
     for (int i = position - 1; i < size; i++) {
-        arr[i] = pClient[i + 1];
+        new_pClient[i] = pClient[i + 1];
     }
     delete[] pClient;
-    pClient = arr;
+    pClient = new_pClient;
+
+    remove_element_from_file(file, position);
+
     cout << "The data was successfully deleted " << endl;
 }
 
-void add_clients(client *&pClient, int &size, int numberOfPeopleToAdd) {
-    client *arr = new client[size + numberOfPeopleToAdd];
+void add_clients(char *file, client *&pClient, int &size, int numberOfPeopleToAdd) {
+    client *new_pClient = new client[size + numberOfPeopleToAdd];
     for (int i = 0; i < size; i++) {
-        arr[i] = pClient[i];
+        new_pClient[i] = pClient[i];
     }
     for (int j = size; j < size + numberOfPeopleToAdd; j++) {
         int s;
         cout << " your first name : ";
-        cin.getline(arr[j].name.first, 15);
+        cin.getline(new_pClient[j].name.first, 15);
         cout << "second : ";
-        cin.getline(arr[j].name.second, 15);
+        cin.getline(new_pClient[j].name.second, 15);
         cout << "third : ";
-        cin.getline(arr[j].name.third, 15);
+        cin.getline(new_pClient[j].name.third, 15);
         cout << " your gender \n 1) male \n 2) female : " << endl;
         cin >> s;
-        arr[j].gender = (gender) s;
+        new_pClient[j].gender = (gender) s;
         cin.ignore();
         cout << "your nationality : ";
-        cin.getline(arr[j].nation, 15);
+        cin.getline(new_pClient[j].nation, 15);
         cout << "your growth : ";
-        cin >> arr[j].growth;
+        cin >> new_pClient[j].growth;
         cout << "weight : ";
-        cin >> arr[j].weight;
+        cin >> new_pClient[j].weight;
         cin.ignore();
         cout << "data of your birth : " << endl << "number ";
-        cin >> arr[j].data_birth.number;
+        cin >> new_pClient[j].data_birth.number;
         cout << "month ";
-        cin >> arr[j].data_birth.month;
+        cin >> new_pClient[j].data_birth.month;
         cout << "year ";
-        cin >> arr[j].data_birth.year;
+        cin >> new_pClient[j].data_birth.year;
         cout << "your number : ";
-        cin >> arr[j].number_ph;
+        cin >> new_pClient[j].number_ph;
         cout << "your address : " << endl << " index : ";
-        cin >> arr[j].address.index;
+        cin >> new_pClient[j].address.index;
         cin.ignore();
         cout << "country : ";
-        cin.getline(arr[j].address.country, 15);
+        cin.getline(new_pClient[j].address.country, 15);
         cout << "region : ";
-        cin.getline(arr[j].address.region, 15);
+        cin.getline(new_pClient[j].address.region, 15);
         cout << "city : ";
-        cin.getline(arr[j].address.city, 15);
+        cin.getline(new_pClient[j].address.city, 15);
         cout << "street : ";
-        cin.getline(arr[j].address.street, 15);
+        cin.getline(new_pClient[j].address.street, 15);
         cout << " house number : ";
         cin >> s;
-        arr[j].address.number_house = s;
+        new_pClient[j].address.number_house = s;
         cin.ignore();
         cout << "number of your credit card : ";
-        cin >> arr[j].card;
+        cin >> new_pClient[j].card;
         cout << "number of your bank account : ";
-        cin >> arr[j].bank_count;
+        cin >> new_pClient[j].bank_count;
         cin.ignore();
     }
     size += numberOfPeopleToAdd;
     delete[] pClient;
-    pClient = arr;
+    pClient = new_pClient;
+
+    add_clients_to_end_of_file(file, pClient, size, numberOfPeopleToAdd);
 }
 
 void display_client(client client) {
@@ -343,9 +339,6 @@ void display_client(client client) {
 }
 
 void display_array(client *pClient, int size) {
-
-    cout << "info in program: " << endl;
-
     for (int i = 0; i < size; i++) {
         display_client(pClient[i]);
     }
