@@ -121,19 +121,15 @@ int main(int argc, char *argv[]) {
                 break;
             }
             case 7: {
+                display_file(file);
+                break;
+            }
+            case 8: {
                 cout << setw(8) << "Bye!" << endl;
                 system("pause");
                 return 0;
             }
-            case 8: {
-                cout << "----------------------------" << endl;
-                cout << "INFO IN PROGRAM:" << endl;
-                display_array(clients, size);
-                cout << "----------------------------" << endl;
-                cout << "INFO IN FILE:" << endl;
-                display_file(file);
-                cout << "----------------------------" << endl;
-            }
+
         }
     }
 }
@@ -150,8 +146,9 @@ int menu() {
     cout << "4) Output data about one person " << endl;
     cout << "5) Add structure " << endl;
     cout << "6) Delete structure " << endl;
-    cout << "7) Exit " << endl;
-    cout << "8) Display " << endl;
+    cout << "7) Output of an file content" << endl;
+    cout << "8) Exit " << endl;
+
     cout << "Choose : ";
     cin >> n;
     cin.ignore();
