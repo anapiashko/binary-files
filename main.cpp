@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
             }
             case 5: {
                 int numberOfPeopleToAdd;
-                cout << "How many people do you want to add_clients to your database? ";
+                cout << "How many people do you want to add to your database? ";
                 cin >> numberOfPeopleToAdd;
                 cin.ignore();
                 add_clients(file, clients, size, numberOfPeopleToAdd);
@@ -176,6 +176,22 @@ void shell_sort(client *array, int Dimension) {
         }
 }
 
+void delete_one_from_clients(char *file, client *&pClient, int &size, int position) {
+    client *new_pClient = new client[size - 1];
+    for (int i = 0; i < position - 1; i++) {
+        new_pClient[i] = pClient[i];
+    }
+    for (int i = position - 1; i < size; i++) {
+        new_pClient[i] = pClient[i + 1];
+    }
+    delete[] pClient;
+    pClient = new_pClient;
+
+    remove_element_from_file(file, position);
+
+    cout << "The data was successfully deleted " << endl;
+}
+
 void remove_element_from_file(char *file, int Position) {
     ifstream fin;
     ofstream fout;
@@ -205,57 +221,6 @@ void remove_element_from_file(char *file, int Position) {
     remove(file);
     rename(new_file, file);
     display_file(file);
-}
-
-void add_clients_to_end_of_file(char *file, client *array, int size, int numberOfPeopleToAdd) {
-    ofstream fout;
-    fout.open(file, ios::binary | ios::app);
-    client *arr;
-    arr = array + size - numberOfPeopleToAdd;
-    for (int i = 0; i < numberOfPeopleToAdd; i++) {
-        fout.write((char *) (arr + i), sizeof(client));
-    }
-    fout.close();
-}
-
-void display_file(char *file) {
-
-    ifstream fin;
-    fin.open(file, ios::in | ios::binary);
-
-    while (!fin.eof()) {
-        client cl;
-        fin.read((char *) &cl, sizeof(client));
-        display_client(cl);
-    }
-    fin.close();
-}
-
-void init_file(char *file, client *array, int size) {
-    ofstream fout;
-    fout.open(file, ios::out | ios::binary);
-
-    for (int i = 0; i < size; ++i) {
-        fout.write((char *) &array[i], sizeof(client));
-    }
-
-    fout.close();
-}
-
-void delete_one_from_clients(char *file, client *&pClient, int &size, int position) {
-    client *new_pClient = new client[size - 1];
-    for (int i = 0; i < position - 1; i++) {
-        new_pClient[i] = pClient[i];
-    }
-    for (int i = position - 1; i < size; i++) {
-        new_pClient[i] = pClient[i + 1];
-    }
-    delete[] pClient;
-    pClient = new_pClient;
-
-    remove_element_from_file(file, position);
-
-    cout << "The data was successfully deleted " << endl;
 }
 
 void add_clients(char *file, client *&pClient, int &size, int numberOfPeopleToAdd) {
@@ -318,6 +283,17 @@ void add_clients(char *file, client *&pClient, int &size, int numberOfPeopleToAd
     add_clients_to_end_of_file(file, pClient, size, numberOfPeopleToAdd);
 }
 
+void add_clients_to_end_of_file(char *file, client *array, int size, int numberOfPeopleToAdd) {
+    ofstream fout;
+    fout.open(file, ios::binary | ios::app);
+    client *arr;
+    arr = array + size - numberOfPeopleToAdd;
+    for (int i = 0; i < numberOfPeopleToAdd; i++) {
+        fout.write((char *) (arr + i), sizeof(client));
+    }
+    fout.close();
+}
+
 void display_client(client client) {
     cout << "full name : " << client.name.first << " " << client.name.second << " " <<
          client.name.third << endl;
@@ -342,6 +318,19 @@ void display_array(client *pClient, int size) {
     for (int i = 0; i < size; i++) {
         display_client(pClient[i]);
     }
+}
+
+void display_file(char *file) {
+
+    ifstream fin;
+    fin.open(file, ios::in | ios::binary);
+
+    while (!fin.eof()) {
+        client cl;
+        fin.read((char *) &cl, sizeof(client));
+        display_client(cl);
+    }
+    fin.close();
 }
 
 void init_clients(client *pClient, int size) {
@@ -401,10 +390,20 @@ void init_clients(client *pClient, int size) {
 
     char file[] = "clients.txt";
     init_file(file, pClient, size);
-    display_file(file);
 }
 
 client *init_array(int size) {
     client *pClient = new client[size];
     return pClient;
+}
+
+void init_file(char *file, client *array, int size) {
+    ofstream fout;
+    fout.open(file, ios::out | ios::binary);
+
+    for (int i = 0; i < size; ++i) {
+        fout.write((char *) &array[i], sizeof(client));
+    }
+
+    fout.close();
 }
