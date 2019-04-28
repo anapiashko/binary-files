@@ -38,6 +38,8 @@ struct client {
     unsigned long long bank_count;
 };
 
+void clear_screen();
+
 void init_clients(client *pClient, int size);
 
 client *init_array(int size);
@@ -56,7 +58,7 @@ void display_file(char *file);
 
 void add_clients_to_end_of_file(char *file, client *array, int size, int numberOfPeopleToAdd);
 
-void remove_element_from_file(char *file, int Position);
+void remove_element_from_file(char *file, int position);
 
 void shell_sort(client *array, int Dimension);
 
@@ -137,6 +139,9 @@ int main(int argc, char *argv[]) {
 }
 
 int menu() {
+
+    clear_screen();
+
     int n;
     cout << "    menu" << endl;
     cout << "1) Enter massiv" << endl;
@@ -177,24 +182,19 @@ void shell_sort(client *array, int Dimension) {
 }
 
 void delete_one_from_clients(char *file, client *&pClient, int &size, int position) {
-    client *new_pClient = new client[size - 1];
-    for (int i = 0; i < position - 1; i++) {
-        new_pClient[i] = pClient[i];
-    }
+
     for (int i = position - 1; i < size; i++) {
-        new_pClient[i] = pClient[i + 1];
+        pClient[i] = pClient[i + 1];
     }
-    delete[] pClient;
 
     size = size - 1;
-    pClient = new_pClient;
 
     remove_element_from_file(file, position);
 
     cout << "The data was successfully deleted " << endl;
 }
 
-void remove_element_from_file(char *file, int Position) {
+void remove_element_from_file(char *file, int position) {
     ifstream fin;
     ofstream fout;
     fin.open(file, ios::binary);
@@ -204,36 +204,37 @@ void remove_element_from_file(char *file, int Position) {
 
     // write everything before
     fin.seekg(0, ios_base::beg);
-    int before = fin.tellg() / sizeof(client);
-    client *temper = new client[before];
-    for (int i = 0; i < before; ++i) {
+    int amountOfElementsBefore = position - 1;
+    client *temper = new client[amountOfElementsBefore];
+    for (int i = 0; i < amountOfElementsBefore; ++i) {
         fin.read((char *) &temper[i], sizeof(client));
     }
-    fout.open(new_file, ios::out | ios::binary);
-    for (int i = 0; i < before; ++i) {
+    fout.open(new_file, ios::out | ios::trunc | ios::binary);
+    for (int i = 0; i < amountOfElementsBefore; ++i) {
         fout.write((char *) &temper[i], sizeof(client));
     }
+    fout.flush();
     fout.close();
     delete[] temper;
 
     // write everything after
-    fin.seekg((Position) * sizeof(client), ios_base::beg);
-    int amountOfRestElements = n - before - 1;
-    client *temper2 = new client[amountOfRestElements];
-    for (int i = 0; i < amountOfRestElements; ++i) {
+    fin.seekg(position * sizeof(client), ios_base::beg);
+    int amountOfElementsAfter = n - amountOfElementsBefore - 1;
+    client *temper2 = new client[amountOfElementsAfter];
+    for (int i = 0; i < amountOfElementsAfter; ++i) {
         fin.read((char *) &temper2[i], sizeof(client));
     }
     fout.open(new_file, ios::out | ios::binary | ios::app);
-    for (int i = 0; i < amountOfRestElements; ++i) {
+    for (int i = 0; i < amountOfElementsAfter; ++i) {
         fout.write((char *) &temper2[i], sizeof(client));
     }
+    fout.flush();
     fout.close();
     delete[] temper2;
 
     fin.close();
     remove(file);
     rename(new_file, file);
-    display_file(file);
 }
 
 void add_clients(char *file, client *&pClient, int &size, int numberOfPeopleToAdd) {
@@ -429,4 +430,8 @@ void init_file(char *file, client *array, int size) {
     }
 
     fout.close();
+}
+
+void clear_screen() {
+    cout << "\n\n\n\n\n\n\n\n\n\n";
 }
