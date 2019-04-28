@@ -125,10 +125,10 @@ int main(int argc, char *argv[]) {
             }
             case 8: {
                 cout << "----------------------------" << endl;
-                cout << "info in program: " << endl;
+                cout << "INFO IN PROGRAM:" << endl;
                 display_array(clients, size);
                 cout << "----------------------------" << endl;
-                cout << "info in file: " << endl;
+                cout << "INFO IN FILE:" << endl;
                 display_file(file);
                 cout << "----------------------------" << endl;
             }
@@ -185,6 +185,8 @@ void delete_one_from_clients(char *file, client *&pClient, int &size, int positi
         new_pClient[i] = pClient[i + 1];
     }
     delete[] pClient;
+
+    size = size - 1;
     pClient = new_pClient;
 
     remove_element_from_file(file, position);
@@ -195,25 +197,36 @@ void delete_one_from_clients(char *file, client *&pClient, int &size, int positi
 void remove_element_from_file(char *file, int Position) {
     ifstream fin;
     ofstream fout;
-    fin.open(file, ios::in | ios::binary);
+    fin.open(file, ios::binary);
     fin.seekg(0, ios_base::end);
     int n = fin.tellg() / sizeof(client);
     char new_file[] = "new_file.txt";
 
-    fin.seekg((Position - 1) * sizeof(client), ios_base::beg);
+    // write everything before
+    fin.seekg(0, ios_base::beg);
     int before = fin.tellg() / sizeof(client);
     client *temper = new client[before];
-    fin.read((char *) temper, sizeof(temper));
+    for (int i = 0; i < before; ++i) {
+        fin.read((char *) &temper[i], sizeof(client));
+    }
     fout.open(new_file, ios::out | ios::binary);
-    fout.write((char *) temper, sizeof(temper));
+    for (int i = 0; i < before; ++i) {
+        fout.write((char *) &temper[i], sizeof(client));
+    }
     fout.close();
     delete[] temper;
 
+    // write everything after
     fin.seekg((Position) * sizeof(client), ios_base::beg);
-    client *temper2 = new client[n - before - 1];
-    fin.read((char *) temper2, sizeof(temper2));
+    int amountOfRestElements = n - before - 1;
+    client *temper2 = new client[amountOfRestElements];
+    for (int i = 0; i < amountOfRestElements; ++i) {
+        fin.read((char *) &temper2[i], sizeof(client));
+    }
     fout.open(new_file, ios::out | ios::binary | ios::app);
-    fout.write((char *) temper2, sizeof(temper2));
+    for (int i = 0; i < amountOfRestElements; ++i) {
+        fout.write((char *) &temper2[i], sizeof(client));
+    }
     fout.close();
     delete[] temper2;
 
@@ -315,7 +328,9 @@ void display_client(client client) {
 }
 
 void display_array(client *pClient, int size) {
+    cout << "ARRAY SIZE IN PROGRAM: " << size << endl;
     for (int i = 0; i < size; i++) {
+        cout << "CLIENT " << i + 1 << " INFO:" << endl;
         display_client(pClient[i]);
     }
 }
@@ -325,11 +340,18 @@ void display_file(char *file) {
     ifstream fin;
     fin.open(file, ios::in | ios::binary);
 
-    while (!fin.eof()) {
+    fin.seekg(0, ios_base::end);
+    int size = fin.tellg() / sizeof(client);
+    cout << "ARRAY SIZE IN FILE: " << size << endl;
+
+    fin.seekg(0, ios_base::beg);
+    for (int i = 0; i < size; ++i) {
         client cl;
         fin.read((char *) &cl, sizeof(client));
+        cout << "CLIENT " << i + 1 << " INFO:" << endl;
         display_client(cl);
     }
+
     fin.close();
 }
 
@@ -386,6 +408,7 @@ void init_clients(client *pClient, int size) {
 
     for (int i = 0; i < size; i++) {
         pClient[i].bank_count = i + 1;
+        pClient[i].card = i + 1;
     }
 
     char file[] = "clients.txt";
@@ -399,7 +422,7 @@ client *init_array(int size) {
 
 void init_file(char *file, client *array, int size) {
     ofstream fout;
-    fout.open(file, ios::out | ios::binary);
+    fout.open(file, ios::out | ios::trunc | ios::binary);
 
     for (int i = 0; i < size; ++i) {
         fout.write((char *) &array[i], sizeof(client));
